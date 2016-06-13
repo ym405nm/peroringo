@@ -14,16 +14,17 @@ use Mockery\CountValidator\Exception;
 
 class CveController extends Controller {
 	public function api(Request $request){
-		$input_text = Request::input("text");
-		$input_user = Request::input("user_name");
+		$input_text = $request->input("text");
+		$input_user = $request->input("user_name");
 		// slackbot は無視
 		if("slackbot" === $input_user){
 			\Log::info("bot検知" . $input_text);
 			return;
 		}
 		// CVE番号が含まれていないと無視
-		if(preg_match("/CVE-[0-9]{4}-[0-9]{4}", $input_text, $match)){
+		if(preg_match("/CVE-[0-9]{4}-[0-9]{4}/i", $input_text, $match)){
 			$cve_number = $match[0];
+			$cve_number = strtoupper($cve_number); // 小文字で来たクエリを大文字に変換
 		}else{
 			\Log::info("該当記述なし" . $input_text);
 			return;
@@ -44,7 +45,7 @@ class CveController extends Controller {
 					return $node->attr( "href" );
 				} );
 				$search_array = preg_grep( "/contents/", $url_list );
-				if ( 0 < $search_array ) {
+				if ( 0 < count($search_array) ) {
 					// JNVから見つかった場合
 					$content_url = "http://jvndb.jvn.jp" . current( $search_array );
 					sleep( 1 );
@@ -67,7 +68,7 @@ class CveController extends Controller {
 			}catch(Exception $e){
 				\Log::error($e->getMessage());
 			}
-			return \Response::json(array("text" => "JVNから見つからなかったよ。。。"));
+			return \Response::json(array("text" => $cve_number . " はJVNから見つからなかったよ。。。"));
 		}
 	}
 }

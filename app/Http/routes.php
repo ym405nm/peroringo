@@ -15,4 +15,4 @@ Route::get( '/', function () {
 	return view( 'welcome' );
 } );
 
-Route::get('cve/', 'CveController@api');
+Route::post('cve/', 'CveController@api');
