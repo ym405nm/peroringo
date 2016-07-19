@@ -22,7 +22,7 @@ class CveController extends Controller {
 			return;
 		}
 		// CVE番号が含まれていないと無視
-		if(preg_match("/CVE-[0-9]{4}-[0-9]{4}/i", $input_text, $match)){
+		if(preg_match("/CVE-[0-9]{4}-[0-9]{4,7}/i", $input_text, $match)){
 			$cve_number = $match[0];
 			$cve_number = strtoupper($cve_number); // 小文字で来たクエリを大文字に変換
 		}else{
@@ -33,7 +33,9 @@ class CveController extends Controller {
 		$found = $cve->where( "cve", $cve_number );
 		if($found->count() != 0){
 			// CVEが見つかった場合
-			$text = $cve_number . " は「". $found->first()->description . "」だよ ".$found->first()->url;
+			$description = $found->first()->description;
+			$url = $found->first()->url;
+			$text = $cve_number . " は「". $description . "」だよ （test）".$url;
 			return \Response::json( array("text" => $text) );
 		}else{
 			// CVEが見つからなかった場合
