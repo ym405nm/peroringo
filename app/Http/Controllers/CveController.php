@@ -68,7 +68,7 @@ class CveController extends Controller {
 					$save_cve->url         = $content_url;
 					$save_cve->save();
 
-					$text = $cve_number . " は「" . $page_title . "」だよ " . $content_url;
+					$text = $cve_number . " は「" . $page_title . "」だよ " . $content_url."\n".$mitre_url;
 
 					return \Response::json( array( "text" => $text ) );
 
